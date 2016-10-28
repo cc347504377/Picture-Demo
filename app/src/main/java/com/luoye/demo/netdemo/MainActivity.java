@@ -5,6 +5,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements Viewapi {
     private RelativeLayout layout;
     private FloatingActionButton actionButton;
     private int num = 0;
-    private boolean floatstat = false;
+    private int floatstat = 0;
     private boolean stat = true;
 
     @Override
@@ -62,17 +63,24 @@ public class MainActivity extends AppCompatActivity implements Viewapi {
         refresh = (SwipeRefreshLayout) findViewById(R.id.refreshlayout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("图片鉴赏^_^");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setTitle("");
         toolbar.setTitleTextColor(getResources().getColor(R.color.textcolor));
+        toolbar.setNavigationIcon(R.mipmap.ic_launcher);
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                floatstat = !floatstat;
-                if (floatstat)
-                    recycleview.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
-                else
-                    recycleview.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+                floatstat++;
+                switch (floatstat % 3) {
+                    case 0:
+                        recycleview.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+                        break;
+                    case 1:
+                        recycleview.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
+                        break;
+                    case 2:
+                        recycleview.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+                        break;
+                }
             }
         });
         refresh.setColorSchemeColors(getResources().getColor(R.color.colorAccent),
@@ -161,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements Viewapi {
                 public void run() {
                     num = 0;
                 }
-            },1000);
+            },2000);
         }
         return true;
     }

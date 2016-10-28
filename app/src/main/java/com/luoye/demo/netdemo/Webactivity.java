@@ -19,6 +19,7 @@ import com.luoye.demo.netdemo.presenter.GetData;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Webactivity extends AppCompatActivity {
@@ -27,7 +28,7 @@ public class Webactivity extends AppCompatActivity {
     private TextView textview;
     private ViewPager viewpager;
     private List<Datainfo.NewslistBean> list;
-    private View view;
+    private View view,index;
     private List<View> datas;
     private Handler handler = new Handler() {
         @Override
@@ -39,6 +40,7 @@ public class Webactivity extends AppCompatActivity {
             }
         }
     };
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,24 +83,35 @@ public class Webactivity extends AppCompatActivity {
             }
         });
 
-        int position = getIntent().getIntExtra("position", -1);
         if (position != -1) {
-            viewpager.setCurrentItem(position);
+            viewpager.setCurrentItem(datas.indexOf(index));
         }else finish();
     }
 
     private void getlist() {
         list = GetData.getinstance(null, null).list;
         datas = new ArrayList<>();
-        for (Datainfo.NewslistBean bean : list) {
+        //设定观看的图片为当前点击图片的前后各十张
+        for (int i=position-10;i<=position+10;i++) {
+            Log.i("Tag", i+"");
             initview();
+            if (i< 0) {
+                continue;
+            } else if (i >= list.size()) {
+                break;
+            }
+            Datainfo.NewslistBean bean = list.get(i);
             textview.setText(bean.getTitle());
             Bitmap bitmap = ImageLoader.getInstance().loadImageSync(bean.getPicUrl());
             imageView.setImageBitmap(bitmap);
+            if (i==position){
+                index = view;//绑定当前view 用作点击时指向
+            }
             datas.add(view);
         }
     }
     private void initview() {
+        position = getIntent().getIntExtra("position", -1);
         view = getLayoutInflater().inflate(R.layout.imagelayout, null);
         textview = (TextView) view.findViewById(R.id.text);
         imageView = (ImageView) view.findViewById(R.id.image);
